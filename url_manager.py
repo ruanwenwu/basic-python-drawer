@@ -1,36 +1,39 @@
-# coding:utf-8
+#!/usr/bin/python
+# -*- coding:utf-8 -*-
 '''
 Created on 2016年8月10日
 
 @author: ruanwenwu
 '''
-
+import mysql_link
 class UrlManager(object):
     def __init__(self):
-        self.new_urls = set()
-        self.old_urls = set()
-    
-    def add_new_url(self,url):
+        self.mysqlLink = mysql_link.MysqlLink()
+
+    def add_new_url(self,url,type,smallpic):
         if url is None:
             return
-        if url not in self.new_urls and url not in self.old_urls:
-            self.new_urls.add(url)
-    
+        if self.mysqlLink.checkUrlStatus(url):
+            self.mysqlLink.addUrl(url,type,smallpic)
+
     def add_new_urls(self,urls):
-        if urls is None or len(urls) == 0:
-            return
+        if len(urls) == 0:
+            return False
         for url in urls:
-            self.add_new_url(url)
-        
-    def has_new_url(self):
-        return len(self.new_urls) != 0
-    
+            smallpic = url.get("orismall","")
+            self.add_new_url(url['url'],url['type'],smallpic)
     def get_new_url(self):
-        new_url = self.new_urls.pop()
-        self.old_urls.add(new_url)
-        return new_url
+        newUrl =  self.mysqlLink.getOneUrl()
+        return newUrl
+
+    def updateUrl(self,url):
+        self.mysqlLink.updateUrl(url)
+
+    def markFailUrl(self,url):
+        self.mysqlLink.markFail(url)
+
     
-    
+
     
     
 
